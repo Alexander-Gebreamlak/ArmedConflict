@@ -20,37 +20,7 @@ library(multgee)
 library(table1)
 library(dplyr)
 library(tidyr)
-```
-
-```{r}
 library(usethis) 
-
-usethis::use_git_config(user.name = "Alexander-Gebreamlak", user.email = "alex.gebreamlak@mail.utoronto.ca")
-
-# to confirm, generate a git situation-report, your user name and email should appear under Git config (global)
-usethis::git_sitrep()
-```
-
-
-```{r}
-usethis::use_git()
-```
-
-```{r}
-# usethis::create_github_token()
-```
-
-
-```{r}
-usethis::use_git_remote("origin", url = NULL, overwrite = TRUE)
-# usethis::use_github()
-```
-
-
-```{r}
-# library(gitcreds)
-# gitcreds_set()
-# gitcreds_get()
 ```
 
 
@@ -64,6 +34,10 @@ maternalmortality <- rawmaternalmortality %>%
          X2006, X2007, X2008, X2009, X2010, X2011, X2012, X2013, 
          X2014, X2015, X2016, X2017, X2018, X2019)
 
+```
+
+
+```{r}
 maternalmortality_long <- maternalmortality %>%
   pivot_longer(
     cols = X2000:X2019,         
@@ -79,10 +53,63 @@ maternalmortality_long
 
 
 ```{r}
+rawdisaster <- read.csv(here("original", "disaster.csv"), 
+                   header = TRUE, na.strings=c(""))
+
+disaster_filter <- rawdisaster %>%
+  filter(Year >= 2000 & Year <= 2019, 
+         Disaster.Type %in% c("Earthquake", "Drought"))
+
+```
+
+```{r}
+disaster_select <- disaster_filter %>%
+  select(Year, ISO, Disaster.Type)
+
+disaster <- disaster_select %>%
+   mutate(drought = case_when(Disaster.Type == "Drought" ~ 1,TRUE ~ 0),
+    earthquake = case_when(Disaster.Type == "Earthquake" ~ 1, TRUE ~ 0))
+
+disaster
+```
+
+```{r}
+disaster_final <- disaster %>%
+  group_by(Year, ISO) %>%
+  summarize(
+    drought = sum(drought),     
+    earthquake = sum(earthquake) 
+  ) %>%
+  ungroup()
+
+disaster_final
+```
+```{r}
+
+usethis::use_git_config(user.name = "Alexander-Gebreamlak", user.email = "alex.gebreamlak@mail.utoronto.ca")
+
+# to confirm, generate a git situation-report, your user name and email should appear under Git config (global)
+usethis::git_sitrep()
+```
+
+```{r}
+usethis::use_git()
+```
+
+```{r}
+# usethis::create_github_token()
 ```
 
 
 ```{r}
+# usethis::use_git_remote("origin", url = NULL, overwrite = TRUE)
+usethis::use_github()
 ```
 
+
+```{r}
+# library(gitcreds)
+# gitcreds_set()
+# gitcreds_get()
+```
 
