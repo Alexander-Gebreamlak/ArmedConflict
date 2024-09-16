@@ -12,6 +12,15 @@ embed-resources: true
 # install.packages("usethis")
 ```
 
+```{r}
+library(tidyverse)
+library(here)
+library(texreg)
+library(multgee)
+library(table1)
+library(dplyr)
+library(tidyr)
+```
 
 ```{r}
 library(usethis) 
@@ -33,7 +42,8 @@ usethis::use_git()
 
 
 ```{r}
-usethis::use_github()
+usethis::use_git_remote("origin", url = NULL, overwrite = TRUE)
+# usethis::use_github()
 ```
 
 
@@ -41,16 +51,6 @@ usethis::use_github()
 # library(gitcreds)
 # gitcreds_set()
 # gitcreds_get()
-```
-
-```{r}
-library(tidyverse)
-library(here)
-library(texreg)
-library(multgee)
-library(table1)
-library(dplyr)
-library(tidyr)
 ```
 
 
