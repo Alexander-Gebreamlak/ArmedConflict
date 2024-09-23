@@ -28,16 +28,4 @@ write.csv(maternalmortality_long, here("data", "cleaned_maternalmortality.csv"),
 
 
 
-usethis::use_git_config(user.name = "Alexander-Gebreamlak", user.email = "alex.gebreamlak@mail.utoronto.ca")
-
-# to confirm, generate a git situation-report, your user name and email should appear under Git config (global)
-usethis::git_sitrep()
-
-usethis::use_git()
-
-gitcreds::gitcreds_set()
-
-usethis::use_github()
-
-
 
