@@ -6,6 +6,8 @@ library(table1)
 library(dplyr)
 library(tidyr)
 library(usethis) 
+library(countrycode)
+
 
 #Loading and Cleaning Data
 rawdisaster <- read.csv(here("original", "disaster.csv"), 

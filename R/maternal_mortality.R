@@ -6,6 +6,8 @@ library(table1)
 library(dplyr)
 library(tidyr)
 library(usethis) 
+library(countrycode)
+
 
 #Loading and cleaning Data
 
@@ -25,10 +27,6 @@ maternalmortality_long <- maternalmortality %>%
   mutate(Year = as.numeric(Year)) 
 
 write.csv(maternalmortality_long, here("data", "cleaned_maternalmortality.csv"), row.names = FALSE)
-
-
-
-
 
 
 
@@ -73,11 +71,10 @@ merged_mortality_data <- reduce(mortality_list, full_join, by = c("Country.Name"
 head(merged_mortality_data)
 
 #Adding the ISO-3 country code variable to the new data set
-
-library(countrycode)
 merged_mortality_data$ISO <- countrycode(merged_mortality_data$Country.Name,
                             origin = "country.name",
                             destination = "iso3c")
 
+#Dropping Country Name Variable
 merged_mortality_data %>% select (-c(Country.Name))
 
