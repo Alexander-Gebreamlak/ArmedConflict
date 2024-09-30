@@ -19,27 +19,15 @@ source(here("R", "maternal_mortality.R"))
 source(here("R", "Disaster.R"))
 source(here("R", "Derive_Armed_Conflict.R"))
 
-# # Merge the datasets using full_join()
-# Final_data <- merged_mortality_data %>%
-#   full_join(disaster_final, by = c("Year", "ISO")) %>%
-#   full_join(Conflict_data_grouped, by = c("Year", "ISO"))
-# 
-# Final_data <- Final_data %>%
-#   filter(Year < 2020 )
-# 
-# head(Final_data, 10)
-
-########################################################################################
-#put all data frames into list
 All_list <- list(Conflict_data_grouped, merged_mortality_data, disaster_final)
 
-#merge all data frames in list
+# Merge the datasets using full_join()
 All_list |> reduce(full_join, by = c('ISO', 'Year')) -> Finaldata0
 
 Final_data <- Covariates_data |>
   left_join(Finaldata0, by = c('ISO', 'Year'))
 
-# need to fill in NAs with 0's for armconf1, drought, earthquake
+#Replace missing values
 Final_data <- Final_data |>
   mutate(Conflict = replace_na(Conflict, 0),
          drought = replace_na(drought, 0),
