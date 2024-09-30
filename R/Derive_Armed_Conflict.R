@@ -12,17 +12,18 @@ library(countrycode)
 Conflict_data <- read.csv(here("original", "conflictdata.csv"), 
                         header = TRUE, na.strings=c(""))
 
-Conflict_data$Year <- Conflict_data$year + 1
+Conflict_data$Year <- Conflict_data$year
 Conflict_data %>% select (-c(year))
-
-
-Conflict_data_grouped <-  Conflict_data %>%
+  
+Conflict_data_grouped <- Conflict_data %>%
+  mutate(best = as.numeric(best)) %>%  # Convert best column to numeric
   group_by(ISO, Year) %>%
-  summarize(Conflict = n_distinct(conflict_id)) %>%
-  mutate(Conflict = case_when(
-    Conflict >= 1 ~ 1,
-    TRUE ~ 0
-  ))
+  summarise(Totdeath = sum(best, na.rm = TRUE)) %>%  # Sum best, handle NAs
+  mutate(Conflict = ifelse(Totdeath < 25, 0, 1)) %>%  # Create Conflict variable
+  ungroup() %>%
+  mutate(Year = Year + 1) -> confdata
+
+head(confdata)
 
 # Remember that the armed conflict variable was lagged by a year in the analysis.
 
