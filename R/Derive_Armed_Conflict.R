@@ -21,9 +21,9 @@ Conflict_data_grouped <- Conflict_data %>%
   summarise(Totdeath = sum(best, na.rm = TRUE)) %>%  # Sum best, handle NAs
   mutate(Conflict = ifelse(Totdeath < 25, 0, 1)) %>%  # Create Conflict variable
   ungroup() %>%
-  mutate(Year = Year + 1) -> confdata
+  mutate(Year = Year + 1) -> Conflict_data_grouped
 
-head(confdata)
+head(Conflict_data_grouped)
 
 # Remember that the armed conflict variable was lagged by a year in the analysis.
 
