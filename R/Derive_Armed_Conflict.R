@@ -13,7 +13,7 @@ Conflict_data <- read.csv(here("original", "conflictdata.csv"),
                         header = TRUE, na.strings=c(""))
 
 Conflict_data$Year <- Conflict_data$year
-Conflict_data %>% select (-c(year))
+Conflict_data <- Conflict_data %>% select (-c(year))
   
 Conflict_data_grouped <- Conflict_data %>%
   mutate(best = as.numeric(best)) %>%  # Convert best column to numeric

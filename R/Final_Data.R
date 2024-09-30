@@ -32,13 +32,14 @@ Final_data <- Final_data |>
   mutate(Conflict = replace_na(Conflict, 0),
          drought = replace_na(drought, 0),
          earthquake = replace_na(earthquake, 0),
-         Totdeath = replace_na(Totdeath, 0))
-########################################################################################
+         Totdeath = replace_na(Totdeath, 0)) %>%
+  
+Final_data <- Final_data %>% select(-c(year))
 
 write.csv(Final_data, here("data", "Cleaned_primary_analysis_data.csv"), row.names = FALSE)
 
 Final_data_check <-  Final_data %>%
-  group_by(Country.Name) %>%
+  group_by(ISO) %>%
   summarize(count_rows = n_distinct(Year))
 
 Final_data_check
