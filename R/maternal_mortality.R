@@ -78,3 +78,6 @@ merged_mortality_data$ISO <- countrycode(merged_mortality_data$Country.Name,
 #Dropping Country Name Variable
 merged_mortality_data %>% select (-c(Country.Name))
 
+write.csv(merged_mortality_data, here("data", "cleaned_merged_mortality"), row.names = FALSE)
+
+
