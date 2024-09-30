@@ -8,7 +8,6 @@ format: pdf
 ```{r}
 #| label: load-packages
 #| include: false
-source("../.Rprofile")
 ```
 
 
