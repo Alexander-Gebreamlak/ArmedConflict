@@ -5,29 +5,28 @@ date: "2024-09-30"
 format: pdf
 ---
 
-```{r}
-#| label: load-packages
-#| include: false
+```{r, include=FALSE}
+# Loading Packages
+library(tidyverse)
+library(here)
+library(texreg)
+library(multgee)
+library(table1)
+library(dplyr)
+library(tidyr)
+library(usethis) 
+library(ggplot2)
 ```
-
-
-## Perfect your GitHub repo
-
-Some of you may still need to organize your GitHub repo. Use this time to do that. When you are confident with your repo, let me know -- I will try to reproduce your code. 
-
-Your final data should have the following variables (you might have slightly different variable names).
-```{r}
-head(Final_data)
-names(Final_data)
-```
-
 
 Observations from Canada should look like this...
+
 ```{r}
 Final_data %>%
   dplyr::filter(country_name == "Canada")
 ```
+
 Observations from Ecuador should look like this...
+
 ```{r}
 Final_data %>%
   dplyr::filter(country_name == "Ecuador")
@@ -35,58 +34,116 @@ Final_data %>%
 
 ## Exploratory data analysis
 
-Use the rest of the class time to explore the final data that will be used for analysis starting next week. At the end of the class, write a summary of your findings and push your **Quarto document (pdf)** to your repo. 
+Use the rest of the class time to explore the final data that will be used for analysis starting next week. At the end of the class, write a summary of your findings and push your **Quarto document (pdf)** to your repo.
+
 ```{r}
-dim(Final_data)
+head(Final_data)
+tail(Final_data)
 ```
 
+```{r}
+dim(Final_data)
+str(Final_data)
+```
+
+3720 rows by 21 columns
+Data types include: 3 character, 8 integer, and 10 numerical
 
 ```{r}
+# Data shows 186 countries each with 20 rows
 Final_data %>% count(ISO)
 Final_data %>% count(ISO) %>% count(n)
 ```
 
 ```{r}
-colSums(is.na(Final_data))
+#Plotting conflicts by ISO Code (only for countries with minimum 1 conflict)
+conflict_data <- Final_data %>%
+  group_by(ISO) %>%
+  summarise(total_conflicts = sum(Conflict, na.rm = TRUE)) %>%
+  filter(total_conflicts > 0) %>%
+  arrange(desc(total_conflicts))
+conflict_data
+
+#Plotting deaths by ISO Code (only for countries with minimum 1 conflict related death)
+death_data <- Final_data %>%
+  group_by(ISO) %>%
+  summarise(total_deaths = sum(Totdeath, na.rm = TRUE)) %>%
+  filter(total_deaths > 0) %>%
+  arrange(desc(total_deaths))
+death_data
 ```
 
-
 ```{r}
-ggplot(Final_data, aes(Year, MatMor)) + 
-  geom_line(aes(group = ISO))
+# Create the plot for conflict
+ggplot(conflict_data, aes(x = reorder(ISO, -total_conflicts), y = total_conflicts)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Conflict Count by ISO Code", x = "ISO Code", y = "Conflict Count") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 8),
+    plot.title = element_text(hjust = 0.5)  
+  )
 ```
 
+```{r}
+# Create the plot 
+ggplot(death_data, aes(x = reorder(ISO, -total_deaths), y = total_deaths)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Conflict Death Count by ISO Code", x = "ISO Code", y = "Conflict Death Count") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 8),
+    plot.title = element_text(hjust = 0.5))
+
+
+ggplot(conflict_summary, aes(x = Year, y = mean, color = as.factor(Conflict), group = Conflict)) +
+  geom_line(alpha = 0.7, size = 1) + 
+  geom_point() +  
+  labs(title = "Conflict Related Deaths by Year Grouped by Conflict Status",
+       x = "Year",
+       y = "Total Deaths",
+       color = "Conflict Status") +  
+  theme_minimal() +
+  scale_color_manual(values = c("0" = "red", "1" = "blue"))  +
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
 ```{r}
+#Analyze missingness
+missingness <- sum(is.na(Final_data))
+missingness
+```
+
+648 total missing values
+
+```{r}
+
+missingness_column <- colSums(is.na(Final_data))
+missingness_column
+```
+```{r}
+missing_percent <- round(missingness_column/ nrow(Final_data) * 100,3)
+missing_percent
+```
+
+Maternal mortality had the most missingness of the outcome variables (N = 426 or 11.45%)
+
+```{r}
+#Correlation of Outcome variables
+round(cor(Final_data[, c("MatMor", "NeoMor", "InfMor", "Und5Mor")], use = "complete.obs"),4)
+
+```
+
+```{r}
+#Longitudinal Maternal Mortality trends by ISO Code
 ggplot(Final_data, aes(Year, MatMor)) + 
   geom_line(aes(group = ISO), alpha = 1/5) + 
+  labs(title = "Maternal Mortality trends by ISO Code", x = "Year", y = "Maternal Mortality") +
   scale_y_log10() + 
-  geom_smooth(se = FALSE)
+  geom_smooth(se = FALSE) +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
-```{r}
-ggplot(Final_data, aes(Year, NeoMor)) + 
-  geom_line(aes(group = ISO), alpha = 1/5) + 
-  geom_smooth(se = FALSE)
-```
 
-
-```{r}
-ggplot(Final_data, aes(Year, InfMor)) + 
-  geom_line(aes(group = ISO), alpha = 1/5) + 
-  geom_smooth(se = FALSE)
-```
-
-
-```{r}
-ggplot(Final_data, aes(Year, Und5Mor)) + 
-  geom_line(aes(group = ISO), alpha = 1/5) + 
-  geom_smooth(se = FALSE)
-```
-
-
-```{r}
-
-```
 

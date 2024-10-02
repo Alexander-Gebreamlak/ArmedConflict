@@ -33,8 +33,27 @@ Final_data <- Final_data |>
          drought = replace_na(drought, 0),
          earthquake = replace_na(earthquake, 0),
          Totdeath = replace_na(Totdeath, 0)) %>%
-  
-Final_data <- Final_data %>% select(-c(year))
+  select(-c(year))
+
+
+# Converting data types 
+Final_data <- Final_data %>%
+  mutate(         
+    gdp1000 = as.numeric(gdp1000),           
+    popdens = as.numeric(popdens),           
+    urban = as.numeric(urban),               
+    agedep = as.numeric(agedep),             
+    male_edu = as.numeric(male_edu),         
+    temp = as.numeric(temp),                 
+    rainfall1000 = as.numeric(rainfall1000), 
+    Year = as.integer(Year),                
+    Totdeath = as.integer(Totdeath),                
+    OECD = as.integer(OECD),                 
+    OECD2023 = as.integer(OECD2023),         
+    Conflict = as.integer(Conflict),
+    drought = as.integer(drought),           
+    earthquake = as.integer(earthquake)      
+  )
 
 write.csv(Final_data, here("data", "Cleaned_primary_analysis_data.csv"), row.names = FALSE)
 
@@ -43,3 +62,4 @@ Final_data_check <-  Final_data %>%
   summarize(count_rows = n_distinct(Year))
 
 Final_data_check
+
