@@ -1,0 +1,128 @@
+---
+title: "CHL8010: Statistical Programming and Computation in Health Data"
+Alex Gebreamlak: "Week 5 Table 1"
+date: "2024-10-07"
+format: pdf
+---
+
+```{r, include=FALSE}
+# Loading Packages
+library(tidyverse)
+library(tinytex)
+library(here)
+library(texreg)
+library(multgee)
+library(table1)
+library(dplyr)
+library(tidyr)
+library(usethis) 
+library(ggplot2)
+Final_data <- read.csv(here("data","Cleaned_primary_analysis_data.csv"))
+
+```
+
+```{r}
+head(Final_data,10)
+```
+
+
+```{r}
+#| output: asis
+
+# Define the renamed outcome variables and covariates
+outcomes <- c("MatMor" = "Maternal mortality ratio per 100,000 live births", 
+              "NeoMor" = "Neonatal mortality rate per 1,000 live births", 
+              "InfMor" = "Infant mortality rate per 1,000 live births", 
+              "Und5Mor" = "Under-5 mortality rate per 1,000 live births")
+
+covariates <- c("gdp1000" = "GDP per capita", 
+                "OECD" = "OECD member", 
+                "popdens" = "Population density", 
+                "urban" = "Urban residence", 
+                "agedep" = "Age dependency ratio", 
+                "male_edu" = "Male education", 
+                "temp" = "Temperature", 
+                "rainfall1000" = "Rainfall", 
+                "earthquake" = "Earthquakes", 
+                "drought" = "Droughts")
+
+# Restrict countries to 2000 & remove unnecessary columns
+data_2000 <- Final_data %>%
+  filter(Year == 2000) %>%
+  select(-country_name, -region, -ISO, -OECD2023, -Year)
+
+# Make Conflict a factor and label  levels
+data_2000$Conflict <- factor(data_2000$Conflict, 
+                             levels = c(0, 1), 
+                             labels = c("No Conflict in Year 2000", 
+                                        "Conflict in Year 2000"))
+
+# Apply labels to outcomes and covariates
+label(data_2000$MatMor) <- "Maternal mortality ratio per 100,000 live births"
+label(data_2000$NeoMor) <- "Neonatal mortality rate per 1,000 live births"
+label(data_2000$InfMor) <- "Infant mortality rate per 1,000 live births"
+label(data_2000$Und5Mor) <- "Under-5 mortality rate per 1,000 live births"
+label(data_2000$gdp1000) <- "GDP per capita"
+label(data_2000$OECD) <- "OECD member"
+label(data_2000$popdens) <- "Population density"
+label(data_2000$urban) <- "Urban residence"
+label(data_2000$agedep) <- "Age dependency ratio"
+label(data_2000$male_edu) <- "Male education"
+label(data_2000$temp) <- "Temperature"
+label(data_2000$rainfall1000) <- "Rainfall"
+label(data_2000$earthquake) <- "Earthquakes"
+label(data_2000$drought) <- "Droughts"
+
+#Create Table
+caption <- "Table of Armed Conflict Demographics"
+table1_2000 <-table1(~ MatMor + NeoMor + InfMor + Und5Mor + gdp1000 + OECD + 
+                        popdens + urban + agedep + male_edu + temp + 
+                        rainfall1000 + earthquake + drought | Conflict, 
+                      data = data_2000,
+                      caption = caption,
+                      overall = FALSE, 
+                      render.continuous = c(.= "Median [Min, Max]"))
+                      # render.continuous = function(x) 
+                      #   sprintf("%0.1f (%0.1f - %0.1f)", median(x, na.rm = TRUE), 
+                      #           quantile(x, 0.25, na.rm = TRUE), 
+                      #           quantile(x, 0.75, na.rm = TRUE)))
+
+print(table1_2000)
+
+```
+
+```{r}
+#Maternal Mortality Trends between 2000 - 2017
+
+Maternal_Mortality_Plot_Data <- Final_data %>%
+  filter(Year == 2000 | Year == 2017) %>%  # Filter only 2000 & 2017
+  group_by(ISO) %>%                        # Group by ISO
+  mutate(
+    MatMor_2000 = ifelse(Year == 2000, MatMor, NA),
+    MatMor_2017 = ifelse(Year == 2017, MatMor, NA)
+  ) %>%
+  fill(MatMor_2000, .direction = "downup") %>%  # Fill in the 2000 value 
+  fill(MatMor_2017, .direction = "downup") %>%  # Fill in the 2017 value 
+  filter(MatMor_2017 > MatMor_2000) %>%         # Only keep ISO if 2017 > 2000
+  ungroup()                                     # Ungroup 
+
+print(Maternal_Mortality_Plot_Data)
+```
+
+```{r}
+#Q2 Plotting Maternal Mortality Increasing Trends between 2000-2017
+ggplot(Maternal_Mortality_Plot_Data, aes(Year, MatMor)) + 
+  geom_line(aes(group = ISO), alpha = 2/5) + 
+  labs(title = "Maternal Mortality Trends by ISO Code
+       (Only Included Countries that Increased)", x = "Year", 
+       y = "Maternal Mortality") +
+  scale_y_log10() + 
+  geom_smooth(se = FALSE) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_text(data = Maternal_Mortality_Plot_Data %>% filter(Year == 2017),  
+            aes(label = ISO), 
+            hjust = -0.1, 
+            vjust = 0.5,
+            size = 2) 
+
+```
