@@ -29,7 +29,7 @@ head(Final_data,10)
 
 ```{r}
 #| output: asis
-#| 
+
 # Restrict countries to 2000 & remove unnecessary columns
 data_2000 <- Final_data %>%
   filter(Year == 2000) %>%
@@ -87,6 +87,7 @@ table1_2000_latex <- table1(~ MatMor + NeoMor + InfMor + Und5Mor + gdp1000 + OEC
 table_latex <- kable(table1_2000_latex, "latex", booktabs = TRUE, caption = caption) %>%
   kable_styling(latex_options = c("HOLD_position", "scale_down"))
 print(table_latex)
+
 ```
 
 ```{r}
