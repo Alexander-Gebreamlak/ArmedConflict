@@ -17,6 +17,7 @@ library(dplyr)
 library(tidyr)
 library(usethis) 
 library(ggplot2)
+library(kableExtra)
 Final_data <- read.csv(here("data","Cleaned_primary_analysis_data.csv"))
 
 ```
@@ -28,24 +29,7 @@ head(Final_data,10)
 
 ```{r}
 #| output: asis
-
-# Define the renamed outcome variables and covariates
-outcomes <- c("MatMor" = "Maternal mortality ratio per 100,000 live births", 
-              "NeoMor" = "Neonatal mortality rate per 1,000 live births", 
-              "InfMor" = "Infant mortality rate per 1,000 live births", 
-              "Und5Mor" = "Under-5 mortality rate per 1,000 live births")
-
-covariates <- c("gdp1000" = "GDP per capita", 
-                "OECD" = "OECD member", 
-                "popdens" = "Population density", 
-                "urban" = "Urban residence", 
-                "agedep" = "Age dependency ratio", 
-                "male_edu" = "Male education", 
-                "temp" = "Temperature", 
-                "rainfall1000" = "Rainfall", 
-                "earthquake" = "Earthquakes", 
-                "drought" = "Droughts")
-
+#| 
 # Restrict countries to 2000 & remove unnecessary columns
 data_2000 <- Final_data %>%
   filter(Year == 2000) %>%
@@ -56,6 +40,18 @@ data_2000$Conflict <- factor(data_2000$Conflict,
                              levels = c(0, 1), 
                              labels = c("No Conflict in Year 2000", 
                                         "Conflict in Year 2000"))
+
+data_2000$OECD <- factor(data_2000$OECD, 
+                          levels = c(0,1), 
+                          labels = c("No", "Yes"))
+
+data_2000$drought <- factor(data_2000$drought, 
+                            levels = c(0,1), 
+                            labels = c("No", "Yes"))
+
+data_2000$earthquake <- factor(data_2000$earthquake, 
+                               levels = c(0,1), 
+                               labels = c("No", "Yes"))
 
 # Apply labels to outcomes and covariates
 label(data_2000$MatMor) <- "Maternal mortality ratio per 100,000 live births"
@@ -73,22 +69,24 @@ label(data_2000$rainfall1000) <- "Rainfall"
 label(data_2000$earthquake) <- "Earthquakes"
 label(data_2000$drought) <- "Droughts"
 
+```
+
+
+```{r, results = "asis"}
 #Create Table
 caption <- "Table of Armed Conflict Demographics"
-table1_2000 <-table1(~ MatMor + NeoMor + InfMor + Und5Mor + gdp1000 + OECD + 
-                        popdens + urban + agedep + male_edu + temp + 
-                        rainfall1000 + earthquake + drought | Conflict, 
-                      data = data_2000,
-                      caption = caption,
-                      overall = FALSE, 
-                      render.continuous = c(.= "Median [Min, Max]"))
-                      # render.continuous = function(x) 
-                      #   sprintf("%0.1f (%0.1f - %0.1f)", median(x, na.rm = TRUE), 
-                      #           quantile(x, 0.25, na.rm = TRUE), 
-                      #           quantile(x, 0.75, na.rm = TRUE)))
+table1_2000_latex <- table1(~ MatMor + NeoMor + InfMor + Und5Mor + gdp1000 + OECD + 
+                            popdens + urban + agedep + male_edu + temp + 
+                            rainfall1000 + earthquake + drought | Conflict, 
+                          data = data_2000,
+                          caption = caption,
+                          overall = c(left = "Total"), 
+                          render.continuous = c(.= "Median [Min, Max]"))
 
-print(table1_2000)
-
+# Convert to kable for LaTeX compatibility
+table_latex <- kable(table1_2000_latex, "latex", booktabs = TRUE, caption = caption) %>%
+  kable_styling(latex_options = c("HOLD_position", "scale_down"))
+print(table_latex)
 ```
 
 ```{r}
