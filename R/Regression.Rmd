@@ -65,30 +65,24 @@ matmorplm
 
 
 ```{r}
-#include year as factor variable --> coefficient flips?
-
+#include year as factor variable --> coefficient flips
 output <- htmlreg(list(matmormod, matmorplm), doctype = FALSE)
 HTML(output)
 ```
 
+
 ```{r}
-#Log transforming GDP and adding as predictor
-
-matmorplm_loggdp <- plm(MatMor ~ Conflict + log(gdp1000) + OECD + popdens + urban + 
-                  agedep + male_edu + temp + rainfall1000 + earthquake + drought,
-              index = c("ISO", "Year"),
-              effect = "twoways",
-              model = "within",
-              data = Final_data)
-matmorplm_loggdp
-
+preds <- as.formula(" ~ Conflict + gdp1000 + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought + 
+                  ISO + as.factor(Year)")
 ```
 
 
 ```{r}
+matmormod <- lm(update.formula(preds, MatMor ~ .), data = Final_data)
+un5mormod <- lm(update.formula(preds, Und5Mor ~ .), data = Final_data)
+infmormod <- lm(update.formula(preds, InfMor ~ .), data = Final_data)
+neomormod <- lm(update.formula(preds, NeoMor ~ .), data = Final_data)
 ```
 
-
-```{r}
-```
 

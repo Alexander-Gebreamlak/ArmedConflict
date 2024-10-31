@@ -1,0 +1,28 @@
+---
+title: "Log_Transform_Mortality_Models"
+format: pdf
+editor: visual
+---
+
+##  Log transform GDP and use the transformed GDP as one of the predictors
+
+
+```{r}
+#Log transforming GDP and adding as predictor
+
+matmorplm_loggdp <- plm(MatMor ~ Conflict + log(gdp1000) + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought,
+              index = c("ISO", "Year"),
+              effect = "twoways",
+              model = "within",
+              data = Final_data)
+matmorplm_loggdp
+```
+
+```{r}
+```
+
+
+```{r}
+```
+
