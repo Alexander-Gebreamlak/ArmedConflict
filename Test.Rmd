@@ -1,0 +1,94 @@
+---
+title: "Test"
+author: "Alex G"
+date: "2024-10-28"
+output: html_document
+---
+```{r}
+
+library(plm)
+library(tidyverse)
+library(here)
+library(texreg)
+library(multgee)
+library(table1)
+library(dplyr)
+library(tidyr)
+library(usethis) 
+library(countrycode)
+library(htmltools)
+
+```
+
+
+```{r}
+Final_data <- read.csv(here("data","Cleaned_primary_analysis_data.csv"))
+```
+
+
+```{r}
+lmmod <- lm(MatMor ~ -1 + Conflict + gdp1000 + OECD + popdens + urban +
+              agedep + male_edu + temp + rainfall1000 + earthquake + drought +
+              ISO, 
+            data = Final_data)
+lmmod
+```
+
+
+```{r}
+plmmod <- plm(MatMor ~ Conflict + gdp1000 + OECD + popdens + urban +
+                agedep + male_edu + temp + rainfall1000 + earthquake + drought,
+              index = c("ISO"), model = "within", data = Final_data)
+plmmod
+```
+
+
+```{r}
+matmormod <- lm(MatMor ~ -1 + Conflict + gdp1000 + OECD + popdens + urban +
+              agedep + male_edu + temp + rainfall1000 + earthquake + drought +
+              ISO + as.factor(Year), 
+            data = Final_data)
+matmormod
+
+```
+
+
+```{r}
+matmorplm <- plm(MatMor ~ Conflict + gdp1000 + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought,
+              index = c("ISO", "Year"),
+              effect = "twoways",
+              model = "within",
+              data = Final_data)
+matmorplm
+```
+
+
+```{r}
+#include year as factor variable --> coefficient flips?
+
+output <- htmlreg(list(matmormod, matmorplm), doctype = FALSE)
+HTML(output)
+```
+
+```{r}
+#Log transforming GDP and adding as predictor
+
+matmorplm_loggdp <- plm(MatMor ~ Conflict + log(gdp1000) + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought,
+              index = c("ISO", "Year"),
+              effect = "twoways",
+              model = "within",
+              data = Final_data)
+matmorplm_loggdp
+
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+

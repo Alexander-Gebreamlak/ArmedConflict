@@ -94,7 +94,7 @@ print(table_latex)
 #Maternal Mortality Trends between 2000 - 2017
 
 Maternal_Mortality_Plot_Data <- Final_data %>%
-  filter(Year == 2000 | Year == 2017) %>%  # Filter only 2000 & 2017
+  filter(Year >= 2000 & Year <= 2017) %>%  # Filter between 2000 and 2017, inclusive
   group_by(ISO) %>%                        # Group by ISO
   mutate(
     MatMor_2000 = ifelse(Year == 2000, MatMor, NA),
