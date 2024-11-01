@@ -1,28 +1,97 @@
 ---
 title: "Log_Transform_Mortality_Models"
-format: pdf
+format: html
 editor: visual
 ---
 
-##  Log transform GDP and use the transformed GDP as one of the predictors
+```{r}
+library(plm)
+library(tidyverse)
+library(here)
+library(texreg)
+library(multgee)
+library(table1)
+library(dplyr)
+library(tidyr)
+library(usethis) 
+library(countrycode)
+library(htmltools)
+Final_data <- read.csv(here("data","Cleaned_primary_analysis_data.csv"))
+```
 
+##  Log transform GDP and use the transformed GDP as one of the predictors
 
 ```{r}
 #Log transforming GDP and adding as predictor
+Final_data$logGDP <- log(Final_data$gdp1000)
 
-matmorplm_loggdp <- plm(MatMor ~ Conflict + log(gdp1000) + OECD + popdens + urban + 
+matmorplm_logGDP <- plm(MatMor ~ Conflict + logGDP + OECD + popdens + urban + 
                   agedep + male_edu + temp + rainfall1000 + earthquake + drought,
               index = c("ISO", "Year"),
               effect = "twoways",
               model = "within",
               data = Final_data)
-matmorplm_loggdp
+matmorplm_logGDP
 ```
 
 ```{r}
+preds_logGDP <- as.formula(" ~ Conflict + logGDP + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought")
 ```
 
 
 ```{r}
+matmormod_logGDP <- plm(update.formula(preds_logGDP, MatMor ~ .), 
+              index = c("ISO", "Year"),
+              effect = "twoways",
+              model = "within",
+              data = Final_data)
+
+un5mormod_logGDP <- plm(update.formula(preds_logGDP, Und5Mor ~ .), 
+              index = c("ISO", "Year"),
+              effect = "twoways",
+              model = "within",
+              data = Final_data)
+
+infmormod_logGDP <- plm(update.formula(preds_logGDP, InfMor ~ .), 
+              index = c("ISO", "Year"),
+              effect = "twoways",
+              model = "within",
+              data = Final_data)
+
+neomormod_logGDP <- plm(update.formula(preds_logGDP, NeoMor ~ .), 
+              index = c("ISO", "Year"),
+              effect = "twoways",
+              model = "within",
+              data = Final_data)
+```
+
+
+```{r}
+#Apply labels into a list
+label <- list(
+  "MatMor" = "Maternal mortality ratio per 100,000 live births",
+  "logGDP" = "Logarithm of GDP per capita",
+  "OECD" = "OECD member",
+  "popdens" = "Population density",
+  "urban" = "Urban residence",
+  "agedep" = "Age dependency ratio",
+  "male_edu" = "Male education",
+  "temp" = "Temperature",
+  "rainfall1000" = "Rainfall",
+  "earthquake" = "Earthquakes",
+  "drought" = "Droughts"
+)
+
+```
+
+```{r}
+final_output <- htmlreg(
+  list(matmormod_logGDP, un5mormod_logGDP, infmormod_logGDP, neomormod_logGDP), 
+  custom.coef.map = label,
+  custom.model.names = c("Maternal mortality ratio per 100,000 live births", "Under-5 mortality ratio per 100,000 live   births", "Infant mortality ratio per 100,000 live births", "Neonatal mortality ratio per 100,000 live births"), 
+  ci.force = TRUE)
+
+HTML(final_output)
 ```
 
