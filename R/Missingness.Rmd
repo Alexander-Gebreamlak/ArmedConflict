@@ -1,0 +1,100 @@
+---
+title: "Missingness"
+author: "Alex G"
+date: "2024-11-3"
+output: html_document
+---
+```{r}
+
+library(plm)
+library(tidyverse)
+library(here)
+library(texreg)
+library(multgee)
+library(table1)
+library(dplyr)
+library(tidyr)
+library(usethis) 
+library(countrycode)
+library(htmltools)
+library(naniar)
+library(mice)
+```
+
+
+```{r}
+Final_data <- read.csv(here("data","Cleaned_primary_analysis_data.csv"))
+Final_data
+```
+
+```{r}
+Final_data |>
+  arrange(Year, ISO) |>
+  dplyr::select(-country_name, -ISO, -region, -Year) |>
+  vis_miss()
+```
+
+```{r}
+#Log transforming GDP and adding as predictor
+Final_data$logGDP <- log(Final_data$gdp1000)
+
+preds_logGDP <- as.formula(" ~ Conflict + logGDP + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought")
+```
+
+
+```{r}
+matmormod_logGDP <- plm(update.formula(preds_logGDP, MatMor ~ .), 
+              index = c("ISO", "Year"),
+              effect = "twoways",
+              model = "within",
+              data = Final_data)
+
+un5mormod_logGDP <- plm(update.formula(preds_logGDP, Und5Mor ~ .), 
+              index = c("ISO", "Year"),
+              effect = "twoways",
+              model = "within",
+              data = Final_data)
+
+infmormod_logGDP <- plm(update.formula(preds_logGDP, InfMor ~ .), 
+              index = c("ISO", "Year"),
+              effect = "twoways",
+              model = "within",
+              data = Final_data)
+
+neomormod_logGDP <- plm(update.formula(preds_logGDP, NeoMor ~ .), 
+              index = c("ISO", "Year"),
+              effect = "twoways",
+              model = "within",
+              data = Final_data)
+```
+
+```{r}
+midata <- Final_data |>
+  mutate(ISOnum = as.numeric(as.factor(Final_data$ISO))) |>
+  select(-country_name, -ISO)
+```
+
+```{r}
+mice0  <- mice(midata, seed = 100, m = 5, maxit = 0, print = F)
+```
+
+```{r}
+meth <- mice0$method
+meth[c("urban", "male_edu", "temp", "rainfall1000", "MatMor", "InfMor", "NeoMor", "Und5Mor", "loggdp", "popdens")] <- "2l.lmer"
+
+pred <- mice0$predictorMatrix
+pred[c("urban", "male_edu", "temp", "rainfall1000", "MatMor", "InfMor", "NeoMor", "Und5Mor", "loggdp", "popdens"), "ISOnum"] <- -2
+```
+
+```{r}
+mice.multi.out  <- mice(midata, seed = 100, m = 10, maxit = 20,
+                        method = meth,
+                        predictorMatrix = pred)
+```
+
+```{r}
+plot(mice.multi.out)
+```
+
+
