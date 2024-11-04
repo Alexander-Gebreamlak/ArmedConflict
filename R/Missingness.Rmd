@@ -94,7 +94,6 @@ pred[c("urban", "male_edu", "temp", "rainfall1000", "MatMor", "InfMor", "NeoMor"
 ```{r}
 ncol(midata)
 length(meth)
-meth
 ```
 
 
