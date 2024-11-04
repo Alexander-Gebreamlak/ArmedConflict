@@ -81,13 +81,20 @@ mice0  <- mice(midata, seed = 100, m = 5, maxit = 0, print = F)
 
 ```{r}
 meth <- mice0$method
-meth[c("urban", "male_edu", "temp", "rainfall1000", "MatMor", "InfMor", "NeoMor", "Und5Mor", "loggdp", "popdens")] <- "2l.lmer"
+meth[c("urban", "male_edu", "temp", "rainfall1000", "MatMor", "InfMor", "NeoMor", "Und5Mor", "logGDP", "popdens")] <- "2l.lmer"
 ```
 
 
 ```{r}
 pred <- mice0$predictorMatrix
 pred[c("urban", "male_edu", "temp", "rainfall1000", "MatMor", "InfMor", "NeoMor", "Und5Mor", "logGDP", "popdens"), "ISOnum"] <- -2
+```
+
+
+```{r}
+ncol(midata)
+length(meth)
+meth
 ```
 
 
