@@ -5,7 +5,6 @@ date: "2024-11-3"
 output: html_document
 ---
 ```{r}
-
 library(plm)
 library(tidyverse)
 library(here)
@@ -72,11 +71,13 @@ neomormod_logGDP <- plm(update.formula(preds_logGDP, NeoMor ~ .),
 ```{r}
 midata <- Final_data |>
   mutate(ISOnum = as.numeric(as.factor(Final_data$ISO))) |>
-  select(-country_name, -ISO)
+  select(-country_name, -ISO, -gdp1000, -region)
+midata
 ```
 
 ```{r}
 mice0  <- mice(midata, seed = 100, m = 5, maxit = 0, print = F)
+mice0
 ```
 
 ```{r}
@@ -107,4 +108,110 @@ mice.multi.out  <- mice(midata, seed = 100, m = 10, maxit = 20,
 plot(mice.multi.out)
 ```
 
+```{r}
+complete.data.multi2 <- complete(mice.multi.out, "all")
+
+#check the first imputed dataset
+head(complete.data.multi2$`1`, n=20)
+```
+
+
+```{r}
+## fit analysis model and pool results
+
+fit.multi1 <- with(mice.multi.out, 
+                   matmormod <- lm(MatMor ~ Conflict + logGDP + OECD + popdens + urban +
+                              agedep + male_edu + temp + rainfall1000 + earthquake + drought +
+                              ISOnum + as.factor(Year)))
+pool_fit.multi1 <- pool(fit.multi1)
+
+# library(howManyImputations)
+# how_many_imputations(fit.multi1)
+```
+
+
+```{r}
+fit.multi2 <- with(mice.multi.out, 
+                   neomormod <- lm(NeoMor ~ Conflict + logGDP + OECD + popdens + urban +
+                              agedep + male_edu + temp + rainfall1000 + earthquake + drought +
+                              ISOnum + as.factor(Year)))
+pool_fit.multi2 <- pool(fit.multi2)
+```
+
+
+```{r}
+fit.multi3 <- with(mice.multi.out, 
+                   infmormod <- lm(InfMor ~ Conflict + logGDP + OECD + popdens + urban +
+                              agedep + male_edu + temp + rainfall1000 + earthquake + drought +
+                              ISOnum + as.factor(Year)))
+pool_fit.multi3 <- pool(fit.multi3)
+```
+
+
+```{r}
+fit.multi4 <- with(mice.multi.out, 
+                   un5mormod <- lm(Und5Mor ~ Conflict + logGDP + OECD + popdens + urban +
+                              agedep + male_edu + temp + rainfall1000 + earthquake + drought +
+                              ISOnum + as.factor(Year)))
+
+pool_fit.multi4 <- pool(fit.multi4)
+```
+
+
+```{r}
+preds <- as.formula(" ~ Conflict + logGDP + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought + 
+                  ISOnum + as.factor(Year)")
+```
+
+```{r}
+midata_cca <- midata |> drop_na()
+#Regression data for complete case analysis 
+
+matmormod <- lm(update.formula(preds, MatMor ~ .), data = midata_cca)
+un5mormod <- lm(update.formula(preds, Und5Mor ~ .), data = midata_cca)
+infmormod <- lm(update.formula(preds, InfMor ~ .), data = midata_cca)
+neomormod <- lm(update.formula(preds, NeoMor ~ .), data = midata_cca)
+```
+
+```{r}
+#Apply labels into a list
+label <- list(
+  "MatMor" = "Maternal mortality ratio per 100,000 live births",
+  "logGDP" = "Logarithm of GDP per capita",
+  "OECD" = "OECD member",
+  "popdens" = "Population density",
+  "urban" = "Urban residence",
+  "agedep" = "Age dependency ratio",
+  "male_edu" = "Male education",
+  "temp" = "Temperature",
+  "rainfall1000" = "Rainfall",
+  "earthquake" = "Earthquakes",
+  "drought" = "Droughts"
+)
+```
+
+
+```{r}
+table_output <- htmlreg(
+  list(matmormod, pool_fit.multi1, neomormod, pool_fit.multi2, infmormod, pool_fit.multi3, un5mormod, pool_fit.multi4),
+  custom.coef.map = label,
+  custom.model.names = c("Maternal mortality CCA", "Maternal mortality MI",
+                         "Neonatal mortality CCA", "Neonatal mortality MI",
+                         "Under-5 mortality CCA", "Under-5 mortality MI",
+                         "Infant mortality CCA", "Infant mortality MI"),
+  ci.force = TRUE
+)
+
+HTML(table_output)
+
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
 
