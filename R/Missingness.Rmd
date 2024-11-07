@@ -160,19 +160,19 @@ pool_fit.multi4 <- pool(fit.multi4)
 
 
 ```{r}
-preds <- as.formula(" ~ Conflict + logGDP + OECD + popdens + urban + 
+preds <- as.formula(" ~ -1 + Conflict + logGDP + OECD + popdens + urban + 
                   agedep + male_edu + temp + rainfall1000 + earthquake + drought + 
                   ISOnum + as.factor(Year)")
 ```
 
 ```{r}
-midata_cca <- midata |> drop_na()
+# midata_cca <- midata |> drop_na()
 #Regression data for complete case analysis 
 
-matmormod <- lm(update.formula(preds, MatMor ~ .), data = midata_cca)
-un5mormod <- lm(update.formula(preds, Und5Mor ~ .), data = midata_cca)
-infmormod <- lm(update.formula(preds, InfMor ~ .), data = midata_cca)
-neomormod <- lm(update.formula(preds, NeoMor ~ .), data = midata_cca)
+matmormod <- lm(update.formula(preds, MatMor ~ .), data = midata)
+un5mormod <- lm(update.formula(preds, Und5Mor ~ .), data = midata)
+infmormod <- lm(update.formula(preds, InfMor ~ .), data = midata)
+neomormod <- lm(update.formula(preds, NeoMor ~ .), data = midata)
 ```
 
 ```{r}
