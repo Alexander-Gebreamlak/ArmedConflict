@@ -23,7 +23,7 @@ library(mice)
 
 ```{r}
 Final_data <- read.csv(here("data","Cleaned_primary_analysis_data.csv"))
-Final_data
+head(Final_data,10)
 ```
 
 ```{r}
@@ -72,7 +72,8 @@ neomormod_logGDP <- plm(update.formula(preds_logGDP, NeoMor ~ .),
 midata <- Final_data |>
   mutate(ISOnum = as.numeric(as.factor(Final_data$ISO))) |>
   select(-country_name, -ISO, -gdp1000, -region)
-midata
+
+head(midata,10)
 ```
 
 ```{r}
