@@ -1,0 +1,124 @@
+---
+title: "Bootstrap"
+author: "Alex G"
+date: "2024-11-18"
+output: html_document
+---
+```{r}
+library(plm)
+library(tidyverse)
+library(here)
+library(texreg)
+library(multgee)
+library(table1)
+library(dplyr)
+library(tidyr)
+library(usethis) 
+library(countrycode)
+library(htmltools)
+```
+
+```{r}
+Final_data <- read.csv(here("data", "Cleaned_primary_analysis_data.csv"))
+data2017 <- Final_data |>
+  dplyr::filter(Year == 2017) |>
+  dplyr::filter(!is.na(MatMor)) 
+```
+
+
+```{r}
+data2017 |>
+  group_by(Conflict) |>
+  summarise(n = n(),
+            median.matmor = median(MatMor, na.rm = T))
+```
+
+
+```{r}
+obs.med.diff <- median(data2017[data2017$Conflict == 1,]$MatMor) -
+  median(data2017[data2017$Conflict == 0,]$MatMor)
+obs.med.diff
+```
+
+
+```{r}
+matmor.arm1 <- Final_data |>
+  dplyr::filter(Year == 2017 & !is.na(MatMor) & Conflict == 1) |>
+  dplyr::select(ISO, MatMor)
+matmor.arm0 <- Final_data |>
+  dplyr::filter(Year == 2017 & !is.na(MatMor) & Conflict == 0) |>
+  dplyr::select(ISO, MatMor)
+
+set.seed(2024)
+B <- 1000
+med.diff <- rep(NA, B)
+
+for(b in 1:B){
+  resamp.arm1 <- matmor.arm1[sample(nrow(matmor.arm1), size = nrow(matmor.arm1), replace = TRUE),] 
+  #key in bootstrap is with replacement, no difference in median across bootstrap - standard error is 0 
+  resamp.arm0 <- matmor.arm0[sample(nrow(matmor.arm0), size = nrow(matmor.arm0), replace = TRUE),] 
+  med.diff[b] <- median(resamp.arm1$MatMor) - median(resamp.arm0$MatMor)
+}
+
+head(resamp.arm1, 12)
+
+```
+
+
+```{r}
+hist(med.diff, main = "Distribution of bootstrap statistic")
+```
+
+
+```{r}
+#Using the boot package
+# First argument passed will always be the original data
+# Second argument is a vector of indices
+
+library(boot)
+
+getmeddiff <- function(data, indices) {
+  sample_data <- data[indices, ]
+  group_meds <- tapply(sample_data$MatMor, sample_data$Conflict, FUN = function(x) median(x,na.rm=TRUE)) #getting the boot median of MatMor for each Conflict Group
+  meddiff <- group_meds[2] - group_meds[1] # difference between groups
+  return(meddiff)
+}
+
+bootout <- boot(data2017, statistic = getmeddiff, strata = data2017$Conflict, R = 1000)
+bootout
+```
+
+
+```{r}
+bootout$t0
+head(bootout$t) #matrix of 1000 by 1 dimensions
+sd(bootout$t)
+
+#The standard deviation of those values is* the standard error of the estimate
+```
+
+
+```{r}
+#Percentile bootstrap CI
+quantile(bootout$t, probs = c(0.025, 0.975))
+```
+
+```{r}
+#Basic bootstrap CI
+2 * bootout$t0 - quantile(bootout$t, probs = 0.975)
+2 * bootout$t0 - quantile(bootout$t, probs = 0.025)
+```
+
+
+```{r}
+boot.ci(boot.out = bootout, conf = 0.95, type = c("basic", "perc", "bca"))
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
