@@ -1,0 +1,196 @@
+---
+title: "Bootstrap"
+author: "Alex G"
+date: "2024-11-18"
+output: html_document
+---
+```{r}
+library(plm)
+library(tidyverse)
+library(here)
+library(texreg)
+library(multgee)
+library(table1)
+library(dplyr)
+library(tidyr)
+library(usethis) 
+library(countrycode)
+library(htmltools)
+```
+
+```{r}
+Final_data <- read.csv(here("data", "Cleaned_primary_analysis_data.csv"))
+
+Neo_data2017 <- Final_data |>
+  dplyr::filter(Year == 2017) |>
+  dplyr::filter(!is.na(NeoMor)) 
+
+Inf_data2017 <- Final_data |>
+  dplyr::filter(Year == 2017) |>
+  dplyr::filter(!is.na(InfMor))
+
+Und5_data2017 <- Final_data |>
+  dplyr::filter(Year == 2017) |>
+  dplyr::filter(!is.na(Und5Mor))
+```
+
+
+```{r}
+Neo_data2017 |>
+  group_by(Conflict) |>
+  summarise(n = n(),
+            median.neomor = median(NeoMor, na.rm = T))
+
+Inf_data2017 |>
+  group_by(Conflict) |>
+  summarise(n = n(),
+            median.infmor = median(InfMor, na.rm = T))
+
+Und5_data2017 |>
+  group_by(Conflict) |>
+  summarise(n = n(),
+            median.und5mor = median(Und5Mor, na.rm = T))
+```
+
+
+```{r}
+Neo_obs.med.diff <- median(Neo_data2017[Neo_data2017$Conflict == 1,]$NeoMor) -
+  median(Neo_data2017[Neo_data2017$Conflict == 0,]$NeoMor)
+Neo_obs.med.diff
+
+Inf_obs.med.diff <- median(Inf_data2017[Inf_data2017$Conflict == 1,]$InfMor) -
+  median(Inf_data2017[Inf_data2017$Conflict == 0,]$InfMor)
+Inf_obs.med.diff
+
+Und5_obs.med.diff <- median(Und5_data2017[Und5_data2017$Conflict == 1,]$Und5Mor) -
+  median(Und5_data2017[Und5_data2017$Conflict == 0,]$Und5Mor)
+Und5_obs.med.diff
+```
+
+
+```{r}
+# Filter and select data for NeoMor
+neomor.arm1 <- Final_data |>
+  filter(Year == 2017 & !is.na(NeoMor) & Conflict == 1) |>
+  select(ISO, NeoMor)
+neomor.arm0 <- Final_data |>
+  filter(Year == 2017 & !is.na(NeoMor) & Conflict == 0) |>
+  select(ISO, NeoMor)
+
+# Filter and select data for InfMor
+infmor.arm1 <- Final_data |>
+  filter(Year == 2017 & !is.na(InfMor) & Conflict == 1) |>
+  select(ISO, InfMor)
+infmor.arm0 <- Final_data |>
+  filter(Year == 2017 & !is.na(InfMor) & Conflict == 0) |>
+  select(ISO, InfMor)
+
+# Filter and select data for Und5Mor
+und5mor.arm1 <- Final_data |>
+  filter(Year == 2017 & !is.na(Und5Mor) & Conflict == 1) |>
+  select(ISO, Und5Mor)
+und5mor.arm0 <- Final_data |>
+  filter(Year == 2017 & !is.na(Und5Mor) & Conflict == 0) |>
+  select(ISO, Und5Mor)
+```
+
+
+```{r}
+set.seed(2024)
+B <- 1000
+
+bootstrap_median_diff <- function(arm1, arm0, outcome) {
+  med.diff <- numeric(B)
+  
+  for (b in 1:B) {
+    resamp.arm1 <- arm1[sample(nrow(arm1), size = nrow(arm1), replace = TRUE), ]
+    resamp.arm0 <- arm0[sample(nrow(arm0), size = nrow(arm0), replace = TRUE), ]
+    med.diff[b] <- median(resamp.arm1[[outcome]]) - median(resamp.arm0[[outcome]])
+  }
+  
+  return(med.diff)
+}
+
+# Calculate median differences for NeoMor, InfMor, and Und5Mor
+neomor_med_diff <- bootstrap_median_diff(neomor.arm1, neomor.arm0, "NeoMor")
+infmor_med_diff <- bootstrap_median_diff(infmor.arm1, infmor.arm0, "InfMor")
+und5mor_med_diff <- bootstrap_median_diff(und5mor.arm1, und5mor.arm0, "Und5Mor")
+
+```
+
+
+```{r}
+hist(neomor_med_diff, main = "Distribution of Neonatal bootstrap statistic")
+```
+```{r}
+hist(infmor_med_diff, main = "Distribution of Infant bootstrap statistic")
+```
+
+
+```{r}
+hist(und5mor_med_diff, main = "Distribution of Under 5 y/o bootstrap statistic")
+```
+
+```{r}
+library(boot)
+
+# Function for median difference
+getmeddiff <- function(data, indices, outcome) {
+  sample_data <- data[indices, ]
+  group_meds <- tapply(sample_data[[outcome]], sample_data$Conflict, 
+                       FUN = function(x) median(x, na.rm = TRUE)) # Bootstrapped median for each group
+  meddiff <- group_meds[2] - group_meds[1] # Difference between groups
+  return(meddiff)
+}
+```
+
+
+```{r}
+# Bootstrap for NeoMor
+getmeddiff_neomor <- function(data, indices) {
+  getmeddiff(data, indices, "NeoMor")
+}
+bootout_neomor <- boot(Neo_data2017, statistic = getmeddiff_neomor, strata = Neo_data2017$Conflict, R = 1000)
+
+# Bootstrap for InfMor
+getmeddiff_infmor <- function(data, indices) {
+  getmeddiff(data, indices, "InfMor")
+}
+bootout_infmor <- boot(Inf_data2017, statistic = getmeddiff_infmor, strata = Inf_data2017$Conflict, R = 1000)
+
+# Bootstrap for Und5Mor
+getmeddiff_und5mor <- function(data, indices) {
+  getmeddiff(data, indices, "Und5Mor")
+}
+bootout_und5mor <- boot(Und5_data2017, statistic = getmeddiff_und5mor, strata = Und5_data2017$Conflict, R = 1000)
+
+```
+
+
+```{r}
+# Print bootstrap results
+bootout_neomor
+#Basic, Percentile & Bias-corrected and accelerated (BCa) bootstrap CI(s)
+boot.ci(boot.out = bootout_neomor, conf = 0.95, type = c("basic", "perc", "bca"))
+```
+
+
+```{r}
+# Print bootstrap results
+bootout_infmor
+#Basic, Percentile & Bias-corrected and accelerated (BCa) bootstrap CI(s)
+boot.ci(boot.out = bootout_infmor, conf = 0.95, type = c("basic", "perc", "bca"))
+```
+
+
+```{r}
+# Print bootstrap results
+bootout_und5mor
+#Basic, Percentile & Bias-corrected and accelerated (BCa) bootstrap CI(s)
+boot.ci(boot.out = bootout_und5mor, conf = 0.95, type = c("basic", "perc", "bca"))
+```
+
+Interpretation
+Neonatal mortality had the smallest median difference (11.85) and standard error (3.44) of the three mortality types, with the largest being Under 5 mortality (median difference = 28.9, standard error = 9.71). In general, the basic bootstrap CI provided the most narrow CI of the three bootstrap methods, while the percentile based and BCa showed consistent CI(s) for the various mortality types.
+
+
