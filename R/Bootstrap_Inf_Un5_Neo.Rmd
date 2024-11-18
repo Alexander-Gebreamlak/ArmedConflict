@@ -133,9 +133,9 @@ hist(und5mor_med_diff, main = "Distribution of Under 5 y/o bootstrap statistic")
 
 ```{r}
 library(boot)
-
 # Function for median difference
 getmeddiff <- function(data, indices, outcome) {
+  set.seed(2024)
   sample_data <- data[indices, ]
   group_meds <- tapply(sample_data[[outcome]], sample_data$Conflict, 
                        FUN = function(x) median(x, na.rm = TRUE)) # Bootstrapped median for each group
@@ -148,18 +148,21 @@ getmeddiff <- function(data, indices, outcome) {
 ```{r}
 # Bootstrap for NeoMor
 getmeddiff_neomor <- function(data, indices) {
+  set.seed(2024)
   getmeddiff(data, indices, "NeoMor")
 }
 bootout_neomor <- boot(Neo_data2017, statistic = getmeddiff_neomor, strata = Neo_data2017$Conflict, R = 1000)
 
 # Bootstrap for InfMor
 getmeddiff_infmor <- function(data, indices) {
+  set.seed(2024)
   getmeddiff(data, indices, "InfMor")
 }
 bootout_infmor <- boot(Inf_data2017, statistic = getmeddiff_infmor, strata = Inf_data2017$Conflict, R = 1000)
 
 # Bootstrap for Und5Mor
 getmeddiff_und5mor <- function(data, indices) {
+  set.seed(2024)
   getmeddiff(data, indices, "Und5Mor")
 }
 bootout_und5mor <- boot(Und5_data2017, statistic = getmeddiff_und5mor, strata = Und5_data2017$Conflict, R = 1000)
