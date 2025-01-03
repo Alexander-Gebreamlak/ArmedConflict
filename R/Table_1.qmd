@@ -22,12 +22,12 @@ Final_data <- read.csv(here("data","Cleaned_primary_analysis_data.csv"))
 
 ```
 
-```{r}
+```{r, include=FALSE}
 head(Final_data,10)
 ```
 
 
-```{r}
+```{r, include=FALSE}
 #| output: asis
 
 # Restrict countries to 2000 & remove unnecessary columns
@@ -90,7 +90,7 @@ print(table_latex)
 
 ```
 
-```{r}
+```{r, include=FALSE}
 #Maternal Mortality Trends between 2000 - 2017
 
 Maternal_Mortality_Plot_Data <- Final_data %>%
@@ -108,7 +108,7 @@ Maternal_Mortality_Plot_Data <- Final_data %>%
 print(Maternal_Mortality_Plot_Data)
 ```
 
-```{r}
+```{r, include=FALSE}
 #Q2 Plotting Maternal Mortality Increasing Trends between 2000-2017
 ggplot(Maternal_Mortality_Plot_Data, aes(Year, MatMor)) + 
   geom_line(aes(group = ISO), alpha = 2/5) + 
