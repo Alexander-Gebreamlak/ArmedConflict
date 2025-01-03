@@ -1,10 +1,10 @@
 ---
 title: "Log_Transform_Mortality_Models"
-format: html
+format: pdf
 editor: visual
 ---
 
-```{r}
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
 library(plm)
 library(tidyverse)
 library(here)
@@ -21,7 +21,7 @@ Final_data <- read.csv(here("data","Cleaned_primary_analysis_data.csv"))
 
 ##  Log transform GDP and use the transformed GDP as one of the predictors
 
-```{r}
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
 #Log transforming GDP and adding as predictor
 Final_data$logGDP <- log(Final_data$gdp1000)
 
@@ -34,13 +34,13 @@ matmorplm_logGDP <- plm(MatMor ~ Conflict + logGDP + OECD + popdens + urban +
 matmorplm_logGDP
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
 preds_logGDP <- as.formula(" ~ Conflict + logGDP + OECD + popdens + urban + 
                   agedep + male_edu + temp + rainfall1000 + earthquake + drought")
 ```
 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
 matmormod_logGDP <- plm(update.formula(preds_logGDP, MatMor ~ .), 
               index = c("ISO", "Year"),
               effect = "twoways",
@@ -67,11 +67,11 @@ neomormod_logGDP <- plm(update.formula(preds_logGDP, NeoMor ~ .),
 ```
 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
 #Apply labels into a list
 label <- list(
   "MatMor" = "Maternal mortality ratio per 100,000 live births",
-  "logGDP" = "Logarithm of GDP per capita",
+  "logGDP" = "Logarithm of <br> GDP per capita",
   "OECD" = "OECD member",
   "popdens" = "Population density",
   "urban" = "Urban residence",
@@ -89,8 +89,17 @@ label <- list(
 final_output <- htmlreg(
   list(matmormod_logGDP, un5mormod_logGDP, infmormod_logGDP, neomormod_logGDP), 
   custom.coef.map = label,
-  custom.model.names = c("Maternal mortality ratio per 100,000 live births", "Under-5 mortality ratio per 100,000 live   births", "Infant mortality ratio per 100,000 live births", "Neonatal mortality ratio per 100,000 live births"), 
-  ci.force = TRUE)
+  custom.model.names = c(
+    "Maternal Mortality <br> ratio per 100,000 <br> live births", 
+    "Under-5 Mortality <br> ratio per 100,000 <br> live births", 
+    "Infant Mortality <br> ratio per 100,000 <br> live births", 
+    "Neonatal Mortality <br> ratio per 100,000 <br> live births"
+  ),
+  ci.force = TRUE,
+  caption = "Regression Results for Mortality Ratios",
+  caption.above = TRUE,
+  digits = 2, 
+)
 
 HTML(final_output)
 ```

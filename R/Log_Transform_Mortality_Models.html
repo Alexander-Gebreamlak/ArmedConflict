@@ -96,81 +96,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plm)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>✔ ggplot2 3.4.3     ✔ purrr   1.0.2
-✔ tibble  3.2.1     ✔ dplyr   1.1.2
-✔ tidyr   1.3.0     ✔ stringr 1.5.1
-✔ readr   2.1.1     ✔ forcats 0.5.1</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::between() masks plm::between()
-✖ dplyr::filter()  masks stats::filter()
-✖ dplyr::lag()     masks plm::lag(), stats::lag()
-✖ dplyr::lead()    masks plm::lead()</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>here() starts at /Users/alexandergebreamlak/Downloads/GitHub/ArmedConflict</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(texreg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Version:  1.39.3
-Date:     2023-11-09
-Author:   Philip Leifeld (University of Essex)
-
-Consider submitting praise using the praise or praise_interactive functions.
-Please cite the JSS article in your publications -- see citation("texreg").</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'texreg'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following object is masked from 'package:tidyr':
-
-    extract</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(multgee)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: gnm</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(table1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'table1'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    units, units&lt;-</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(usethis) </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(countrycode)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(htmltools)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>Final_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>,<span class="st">"Cleaned_primary_analysis_data.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <section id="log-transform-gdp-and-use-the-transformed-gdp-as-one-of-the-predictors" class="level2">
 <h2 class="anchored" data-anchor-id="log-transform-gdp-and-use-the-transformed-gdp-as-one-of-the-predictors">Log transform GDP and use the transformed GDP as one of the predictors</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Log transforming GDP and adding as predictor</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>Final_data<span class="sc">$</span>logGDP <span class="ot">&lt;-</span> <span class="fu">log</span>(Final_data<span class="sc">$</span>gdp1000)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>matmorplm_logGDP <span class="ot">&lt;-</span> <span class="fu">plm</span>(MatMor <span class="sc">~</span> Conflict <span class="sc">+</span> logGDP <span class="sc">+</span> OECD <span class="sc">+</span> popdens <span class="sc">+</span> urban <span class="sc">+</span> </span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                  agedep <span class="sc">+</span> male_edu <span class="sc">+</span> temp <span class="sc">+</span> rainfall1000 <span class="sc">+</span> earthquake <span class="sc">+</span> drought,</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">index =</span> <span class="fu">c</span>(<span class="st">"ISO"</span>, <span class="st">"Year"</span>),</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">effect =</span> <span class="st">"twoways"</span>,</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">model =</span> <span class="st">"within"</span>,</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> Final_data)</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>matmorplm_logGDP</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Model Formula: MatMor ~ Conflict + logGDP + OECD + popdens + urban + agedep + 
@@ -184,73 +112,53 @@ Coefficients:
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>preds_logGDP <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">" ~ Conflict + logGDP + OECD + popdens + urban + </span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="st">                  agedep + male_edu + temp + rainfall1000 + earthquake + drought"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>matmormod_logGDP <span class="ot">&lt;-</span> <span class="fu">plm</span>(<span class="fu">update.formula</span>(preds_logGDP, MatMor <span class="sc">~</span> .), </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">index =</span> <span class="fu">c</span>(<span class="st">"ISO"</span>, <span class="st">"Year"</span>),</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">effect =</span> <span class="st">"twoways"</span>,</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">model =</span> <span class="st">"within"</span>,</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> Final_data)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>un5mormod_logGDP <span class="ot">&lt;-</span> <span class="fu">plm</span>(<span class="fu">update.formula</span>(preds_logGDP, Und5Mor <span class="sc">~</span> .), </span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">index =</span> <span class="fu">c</span>(<span class="st">"ISO"</span>, <span class="st">"Year"</span>),</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">effect =</span> <span class="st">"twoways"</span>,</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">model =</span> <span class="st">"within"</span>,</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> Final_data)</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>infmormod_logGDP <span class="ot">&lt;-</span> <span class="fu">plm</span>(<span class="fu">update.formula</span>(preds_logGDP, InfMor <span class="sc">~</span> .), </span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">index =</span> <span class="fu">c</span>(<span class="st">"ISO"</span>, <span class="st">"Year"</span>),</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">effect =</span> <span class="st">"twoways"</span>,</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">model =</span> <span class="st">"within"</span>,</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> Final_data)</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>neomormod_logGDP <span class="ot">&lt;-</span> <span class="fu">plm</span>(<span class="fu">update.formula</span>(preds_logGDP, NeoMor <span class="sc">~</span> .), </span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>              <span class="at">index =</span> <span class="fu">c</span>(<span class="st">"ISO"</span>, <span class="st">"Year"</span>),</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>              <span class="at">effect =</span> <span class="st">"twoways"</span>,</span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>              <span class="at">model =</span> <span class="st">"within"</span>,</span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> Final_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Apply labels into a list</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>label <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"MatMor"</span> <span class="ot">=</span> <span class="st">"Maternal mortality ratio per 100,000 live births"</span>,</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"logGDP"</span> <span class="ot">=</span> <span class="st">"Logarithm of GDP per capita"</span>,</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"OECD"</span> <span class="ot">=</span> <span class="st">"OECD member"</span>,</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"popdens"</span> <span class="ot">=</span> <span class="st">"Population density"</span>,</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"urban"</span> <span class="ot">=</span> <span class="st">"Urban residence"</span>,</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"agedep"</span> <span class="ot">=</span> <span class="st">"Age dependency ratio"</span>,</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"male_edu"</span> <span class="ot">=</span> <span class="st">"Male education"</span>,</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"temp"</span> <span class="ot">=</span> <span class="st">"Temperature"</span>,</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"rainfall1000"</span> <span class="ot">=</span> <span class="st">"Rainfall"</span>,</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"earthquake"</span> <span class="ot">=</span> <span class="st">"Earthquakes"</span>,</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"drought"</span> <span class="ot">=</span> <span class="st">"Droughts"</span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>final_output <span class="ot">&lt;-</span> <span class="fu">htmlreg</span>(</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(matmormod_logGDP, un5mormod_logGDP, infmormod_logGDP, neomormod_logGDP), </span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">custom.coef.map =</span> label,</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">custom.model.names =</span> <span class="fu">c</span>(<span class="st">"Maternal mortality ratio per 100,000 live births"</span>, <span class="st">"Under-5 mortality ratio per 100,000 live   births"</span>, <span class="st">"Infant mortality ratio per 100,000 live births"</span>, <span class="st">"Neonatal mortality ratio per 100,000 live births"</span>), </span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci.force =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="fu">HTML</span>(final_output)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>final_output <span class="ot">&lt;-</span> <span class="fu">htmlreg</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(matmormod_logGDP, un5mormod_logGDP, infmormod_logGDP, neomormod_logGDP), </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">custom.coef.map =</span> label,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">custom.model.names =</span> <span class="fu">c</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Maternal Mortality &lt;br&gt; ratio per 100,000 &lt;br&gt; live births"</span>, </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Under-5 Mortality &lt;br&gt; ratio per 100,000 &lt;br&gt; live births"</span>, </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Infant Mortality &lt;br&gt; ratio per 100,000 &lt;br&gt; live births"</span>, </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Neonatal Mortality &lt;br&gt; ratio per 100,000 &lt;br&gt; live births"</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci.force =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Regression Results for Mortality Ratios"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption.above =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">2</span>, </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">HTML</span>(final_output)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="texreg caption-top table table-sm table-striped small" data-quarto-postprocess="true">
-<caption>Statistical models</caption>
+<caption>Regression Results for Mortality Ratios</caption>
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">&nbsp;</th>
-<th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">Maternal mortality ratio per 100,000 live births</th>
-<th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">Under-5 mortality ratio per 100,000 live births</th>
-<th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">Infant mortality ratio per 100,000 live births</th>
-<th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">Neonatal mortality ratio per 100,000 live births</th>
+<th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">Maternal Mortality<br>
+ratio per 100,000<br>
+live births</th>
+<th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">Under-5 Mortality<br>
+ratio per 100,000<br>
+live births</th>
+<th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">Infant Mortality<br>
+ratio per 100,000<br>
+live births</th>
+<th data-quarto-table-cell-role="th" style="padding-left: 5px; padding-right: 5px">Neonatal Mortality<br>
+ratio per 100,000<br>
+live births</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd" style="border-top: 1px solid #000000;">
-<td style="padding-left: 5px; padding-right: 5px">Logarithm of GDP per capita</td>
+<td style="padding-left: 5px; padding-right: 5px">Logarithm of<br>
+GDP per capita</td>
 <td style="padding-left: 5px; padding-right: 5px">-27.56<sup>*</sup></td>
 <td style="padding-left: 5px; padding-right: 5px">-8.69<sup>*</sup></td>
 <td style="padding-left: 5px; padding-right: 5px">-6.12<sup>*</sup></td>
