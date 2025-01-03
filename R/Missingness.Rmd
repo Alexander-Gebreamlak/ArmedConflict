@@ -4,7 +4,7 @@ author: "Alex G"
 date: "2024-11-3"
 output: html_document
 ---
-```{r}
+```{r, include=FALSE}
 library(plm)
 library(tidyverse)
 library(here)
@@ -21,12 +21,12 @@ library(mice)
 ```
 
 
-```{r}
+```{r, include=FALSE}
 Final_data <- read.csv(here("data","Cleaned_primary_analysis_data.csv"))
-head(Final_data,10)
 ```
 
 ```{r}
+#Visualize missing data
 Final_data |>
   arrange(Year, ISO) |>
   dplyr::select(-country_name, -ISO, -region, -Year) |>
@@ -35,43 +35,17 @@ Final_data |>
 
 ```{r}
 #Log transforming GDP and adding as predictor
-Final_data$logGDP <- log(Final_data$gdp1000)
-
-preds_logGDP <- as.formula(" ~ Conflict + logGDP + OECD + popdens + urban + 
-                  agedep + male_edu + temp + rainfall1000 + earthquake + drought")
+Final_data <- Final_data |>
+  mutate(logGDP = log(gdp1000)) |>
+  select(-gdp1000)
+head(Final_data,10)
 ```
 
-
-```{r}
-matmormod_logGDP <- plm(update.formula(preds_logGDP, MatMor ~ .), 
-              index = c("ISO", "Year"),
-              effect = "twoways",
-              model = "within",
-              data = Final_data)
-
-un5mormod_logGDP <- plm(update.formula(preds_logGDP, Und5Mor ~ .), 
-              index = c("ISO", "Year"),
-              effect = "twoways",
-              model = "within",
-              data = Final_data)
-
-infmormod_logGDP <- plm(update.formula(preds_logGDP, InfMor ~ .), 
-              index = c("ISO", "Year"),
-              effect = "twoways",
-              model = "within",
-              data = Final_data)
-
-neomormod_logGDP <- plm(update.formula(preds_logGDP, NeoMor ~ .), 
-              index = c("ISO", "Year"),
-              effect = "twoways",
-              model = "within",
-              data = Final_data)
-```
 
 ```{r}
 midata <- Final_data |>
   mutate(ISOnum = as.numeric(as.factor(Final_data$ISO))) |>
-  select(-country_name, -ISO, -gdp1000, -region)
+  select(-country_name, -ISO, -OECD2023, -region)
 
 head(midata,10)
 ```
